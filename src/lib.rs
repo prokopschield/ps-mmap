@@ -1,12 +1,16 @@
 pub mod error;
+pub mod rw;
 pub use error::PsMmapError;
 use error::Result;
 pub use memmap2::MmapOptions;
+use rw::MutableMemoryMapping;
 use std::fs::OpenOptions;
 use std::ops::Deref;
 use std::sync::Arc;
 use std::sync::Mutex;
-use std::sync::MutexGuard;
+
+#[cfg(test)]
+pub mod tests;
 
 pub enum MemoryMappingOwner {
     Ro(memmap2::Mmap),
@@ -77,9 +81,9 @@ impl<'lt> MemoryMapping<'lt> {
         &self.roref
     }
 
-    pub fn rw(&'lt self) -> Result<MutexGuard<&mut [u8]>> {
-        match &self.rwref {
-            Some(arc) => Ok(arc.lock()?),
+    pub fn rw(&self) -> Result<MutableMemoryMapping<'lt>> {
+        match self.rwref.clone() {
+            Some(arc) => Ok(MutableMemoryMapping::from(self.clone(), arc)?),
             None => Err(PsMmapError::ReadOnly),
         }
     }
