@@ -6,6 +6,7 @@ use std::fs::OpenOptions;
 use std::ops::Deref;
 use std::sync::Arc;
 use std::sync::Mutex;
+use std::sync::MutexGuard;
 
 pub enum MemoryMapOwner {
     Ro(memmap2::Mmap),
@@ -25,8 +26,8 @@ impl Deref for MemoryMapOwner {
 
 pub struct MemoryMap<'lt> {
     owner: Arc<MemoryMapOwner>,
-    pub roref: &'lt [u8],
-    pub rwref: Result<Arc<Mutex<&'lt mut [u8]>>>,
+    roref: &'lt [u8],
+    rwref: Option<Arc<Mutex<&'lt mut [u8]>>>,
 }
 
 impl<'lt> MemoryMap<'lt> {
@@ -36,11 +37,11 @@ impl<'lt> MemoryMap<'lt> {
 
         let roref: &'lt [u8] = unsafe { std::slice::from_raw_parts(pointer, length) };
 
-        let rwref: Result<Arc<Mutex<&'lt mut [u8]>>> = match readonly {
-            false => Ok(Arc::from(Mutex::from(unsafe {
+        let rwref: Option<Arc<Mutex<&'lt mut [u8]>>> = match readonly {
+            false => Some(Arc::from(Mutex::from(unsafe {
                 std::slice::from_raw_parts_mut(pointer, length)
             }))),
-            true => Err(PsMmapError::ReadOnly),
+            true => None,
         };
 
         let map = Self {
@@ -71,6 +72,17 @@ impl<'lt> MemoryMap<'lt> {
 
         Self::new(owner.into(), false)
     }
+
+    pub fn ro(&self) -> &[u8] {
+        &self.roref
+    }
+
+    pub fn rw(&'lt self) -> Result<MutexGuard<&mut [u8]>> {
+        match &self.rwref {
+            Some(arc) => Ok(arc.lock()?),
+            None => Err(PsMmapError::ReadOnly),
+        }
+    }
 }
 
 impl<'lt> Clone for MemoryMap<'lt> {
@@ -78,10 +90,7 @@ impl<'lt> Clone for MemoryMap<'lt> {
         Self {
             owner: self.owner.clone(),
             roref: self.roref,
-            rwref: match &self.rwref {
-                Ok(arc) => Ok(arc.clone()),
-                _ => Err(PsMmapError::ReadOnly),
-            },
+            rwref: self.rwref.clone(),
         }
     }
 }
