@@ -8,12 +8,12 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 
-pub enum MemoryMapOwner {
+pub enum MemoryMappingOwner {
     Ro(memmap2::Mmap),
     Rw(memmap2::MmapMut),
 }
 
-impl Deref for MemoryMapOwner {
+impl Deref for MemoryMappingOwner {
     type Target = [u8];
 
     fn deref(&self) -> &Self::Target {
@@ -24,14 +24,14 @@ impl Deref for MemoryMapOwner {
     }
 }
 
-pub struct MemoryMap<'lt> {
-    owner: Arc<MemoryMapOwner>,
+pub struct MemoryMapping<'lt> {
+    owner: Arc<MemoryMappingOwner>,
     roref: &'lt [u8],
     rwref: Option<Arc<Mutex<&'lt mut [u8]>>>,
 }
 
-impl<'lt> MemoryMap<'lt> {
-    fn new(owner: Arc<MemoryMapOwner>, readonly: bool) -> Result<Self> {
+impl<'lt> MemoryMapping<'lt> {
+    fn new(owner: Arc<MemoryMappingOwner>, readonly: bool) -> Result<Self> {
         let pointer = owner.as_ptr() as *mut u8;
         let length = owner.len();
 
@@ -60,15 +60,15 @@ impl<'lt> MemoryMap<'lt> {
             .open(file_name)?;
 
         let owner = Arc::from(match readonly {
-            true => MemoryMapOwner::Ro(unsafe { options.map(&file) }?),
-            false => MemoryMapOwner::Rw(unsafe { options.map_mut(&file) }?),
+            true => MemoryMappingOwner::Ro(unsafe { options.map(&file) }?),
+            false => MemoryMappingOwner::Rw(unsafe { options.map_mut(&file) }?),
         });
 
         Self::new(owner, readonly)
     }
 
     pub fn new_blank(options: &MmapOptions) -> Result<Self> {
-        let owner = MemoryMapOwner::Rw(options.map_anon()?);
+        let owner = MemoryMappingOwner::Rw(options.map_anon()?);
 
         Self::new(owner.into(), false)
     }
@@ -85,7 +85,7 @@ impl<'lt> MemoryMap<'lt> {
     }
 }
 
-impl<'lt> Clone for MemoryMap<'lt> {
+impl<'lt> Clone for MemoryMapping<'lt> {
     fn clone(&self) -> Self {
         Self {
             owner: self.owner.clone(),
@@ -95,7 +95,7 @@ impl<'lt> Clone for MemoryMap<'lt> {
     }
 }
 
-impl<'lt> Deref for MemoryMap<'lt> {
+impl<'lt> Deref for MemoryMapping<'lt> {
     type Target = [u8];
 
     fn deref(&self) -> &Self::Target {
