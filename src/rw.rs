@@ -1,4 +1,3 @@
-use crate::error::Result;
 use crate::MemoryMapping;
 use std::ops::Deref;
 use std::sync::Arc;
@@ -11,8 +10,8 @@ pub struct MutableMemoryMapping<'lt> {
 }
 
 impl<'lt> MutableMemoryMapping<'lt> {
-    pub fn from(mapping: MemoryMapping<'lt>, arc: Arc<Mutex<&'lt mut [u8]>>) -> Result<Self> {
-        Ok(Self { mapping, arc })
+    pub fn from(mapping: MemoryMapping<'lt>, arc: Arc<Mutex<&'lt mut [u8]>>) -> Self {
+        Self { mapping, arc }
     }
 
     pub fn done(self) -> MemoryMapping<'lt> {

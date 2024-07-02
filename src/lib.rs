@@ -83,7 +83,7 @@ impl<'lt> MemoryMapping<'lt> {
 
     pub fn rw(&self) -> Result<MutableMemoryMapping<'lt>> {
         match self.rwref.clone() {
-            Some(arc) => Ok(MutableMemoryMapping::from(self.clone(), arc)?),
+            Some(arc) => Ok(MutableMemoryMapping::from(self.clone(), arc)),
             None => Err(PsMmapError::ReadOnly),
         }
     }
