@@ -78,7 +78,7 @@ impl<'lt> MemoryMapping<'lt> {
     }
 
     pub fn ro(&self) -> &[u8] {
-        &self.roref
+        self.roref
     }
 
     pub fn rw(&self) -> Result<MutableMemoryMapping<'lt>> {
