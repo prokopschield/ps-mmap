@@ -1,8 +1,10 @@
 mod error;
+mod guards;
 mod readable;
 mod writable;
 
 pub use error::PsMmapError;
+pub use guards::{ReadGuard, WriteGuard};
 pub use readable::ReadableMemoryMap;
 pub use writable::WritableMemoryMap;
 
