@@ -15,6 +15,14 @@ pub enum MemoryMap {
 }
 
 impl MemoryMap {
+    pub fn map(file_path: &str, readonly: bool) -> Result<Self, PsMmapError> {
+        if readonly {
+            Self::map_readable(file_path)
+        } else {
+            Self::map_writable(file_path)
+        }
+    }
+
     pub fn map_readable(file_path: &str) -> Result<Self, PsMmapError> {
         Ok(Self::Readable(ReadableMemoryMap::map(file_path)?))
     }
