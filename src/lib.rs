@@ -15,12 +15,12 @@ pub enum MemoryMap {
 }
 
 impl MemoryMap {
-    pub fn map_readable(file_name: &str) -> Result<Self, PsMmapError> {
-        Ok(Self::Readable(ReadableMemoryMap::map(file_name)?))
+    pub fn map_readable(file_path: &str) -> Result<Self, PsMmapError> {
+        Ok(Self::Readable(ReadableMemoryMap::map(file_path)?))
     }
 
-    pub fn map_writable(file_name: &str) -> Result<Self, PsMmapError> {
-        Ok(Self::Writable(WritableMemoryMap::map(file_name)?))
+    pub fn map_writable(file_path: &str) -> Result<Self, PsMmapError> {
+        Ok(Self::Writable(WritableMemoryMap::map(file_path)?))
     }
 
     pub fn read(&self) -> ReadGuard {

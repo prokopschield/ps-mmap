@@ -15,8 +15,8 @@ pub struct WritableMemoryMap {
 }
 
 impl WritableMemoryMap {
-    pub fn map(file_name: &str) -> Result<Self, PsMmapError> {
-        let file = OpenOptions::new().read(true).write(true).open(file_name)?;
+    pub fn map(file_path: &str) -> Result<Self, PsMmapError> {
+        let file = OpenOptions::new().read(true).write(true).open(file_path)?;
         let mmap = unsafe { MmapMut::map_mut(&file)? };
 
         let mmap = Self {
