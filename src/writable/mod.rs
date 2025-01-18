@@ -33,6 +33,17 @@ impl WritableMemoryMap {
     pub fn write(&self) -> ArcRwLockWriteGuard<RawRwLock, MmapMut> {
         self.inner.0.write_arc()
     }
+
+    pub fn as_mut_ptr(&self) -> *mut u8 {
+        let mmap_ptr = self.inner.0.data_ptr();
+        let mmap = unsafe { &mut *mmap_ptr };
+
+        mmap.as_mut_ptr()
+    }
+
+    pub fn as_ptr(&self) -> *const u8 {
+        self.as_mut_ptr()
+    }
 }
 
 impl AsRef<Arc<RwLock<MmapMut>>> for WritableMemoryMap {

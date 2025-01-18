@@ -58,4 +58,18 @@ impl MemoryMap {
             Self::Writable(mmap) => Ok(closure(&mut mmap.write())),
         }
     }
+
+    pub fn as_ptr(&self) -> *const u8 {
+        match self {
+            Self::Readable(value) => value.as_ptr(),
+            Self::Writable(value) => value.as_ptr(),
+        }
+    }
+
+    pub fn try_as_mut_ptr(&self) -> Result<*mut u8, PsMmapError> {
+        match self {
+            Self::Readable(_) => Err(PsMmapError::ReadOnly),
+            Self::Writable(value) => Ok(value.as_mut_ptr()),
+        }
+    }
 }
