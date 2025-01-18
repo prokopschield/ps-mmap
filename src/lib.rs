@@ -23,6 +23,22 @@ impl MemoryMap {
         Ok(Self::Writable(WritableMemoryMap::map(file_name)?))
     }
 
+    pub fn read(&self) -> ReadGuard {
+        self.into()
+    }
+
+    pub fn into_read(self) -> ReadGuard {
+        self.into()
+    }
+
+    pub fn try_write(&self) -> Result<WriteGuard, PsMmapError> {
+        self.try_into()
+    }
+
+    pub fn try_into_write(self) -> Result<WriteGuard, PsMmapError> {
+        self.try_into()
+    }
+
     pub fn read_with<F, R>(&self, closure: F) -> R
     where
         F: FnOnce(&[u8]) -> R,
