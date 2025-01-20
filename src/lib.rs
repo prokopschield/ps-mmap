@@ -80,4 +80,15 @@ impl MemoryMap {
             Self::Writable(value) => Ok(value.as_mut_ptr()),
         }
     }
+
+    pub fn len(&self) -> usize {
+        match self {
+            Self::Readable(value) => value.len(),
+            Self::Writable(value) => value.len(),
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }
