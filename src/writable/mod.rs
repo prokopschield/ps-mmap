@@ -44,6 +44,20 @@ impl WritableMemoryMap {
     pub fn as_ptr(&self) -> *const u8 {
         self.as_mut_ptr()
     }
+
+    unsafe fn inner_mmap(&self) -> &MmapMut {
+        &*self.inner.0.data_ptr()
+    }
+
+    pub fn len(&self) -> usize {
+        let mmap = unsafe { self.inner_mmap() };
+
+        mmap.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }
 
 impl AsRef<Arc<RwLock<MmapMut>>> for WritableMemoryMap {
