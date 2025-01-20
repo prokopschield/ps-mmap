@@ -5,7 +5,7 @@ use parking_lot::{ArcRwLockWriteGuard, RawRwLock};
 
 use crate::{MemoryMap, PsMmapError, WritableMemoryMap};
 
-#[derive()]
+#[derive(Debug)]
 pub enum WriteGuard {
     Writable(ArcRwLockWriteGuard<RawRwLock, MmapMut>, WritableMemoryMap),
 }
