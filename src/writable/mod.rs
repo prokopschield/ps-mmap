@@ -12,7 +12,13 @@ use crate::PsMmapError;
 
 #[derive(Clone, Debug)]
 pub struct WritableMemoryMap {
-    inner: Arc<(Arc<RwLock<MmapMut>>, File)>,
+    inner: Arc<WritableMemoryMapInner>,
+}
+
+#[derive(Debug)]
+pub struct WritableMemoryMapInner {
+    file: File,
+    mmap: Arc<RwLock<MmapMut>>,
 }
 
 impl WritableMemoryMap {
@@ -23,23 +29,26 @@ impl WritableMemoryMap {
         let mmap = unsafe { MmapMut::map_mut(&file)? };
 
         let mmap = Self {
-            inner: Arc::from((Arc::from(RwLock::from(mmap)), file)),
+            inner: Arc::new(WritableMemoryMapInner {
+                file,
+                mmap: Arc::new(RwLock::new(mmap)),
+            }),
         };
 
         Ok(mmap)
     }
 
     pub fn read(&self) -> ArcRwLockReadGuard<RawRwLock, MmapMut> {
-        self.inner.0.read_arc()
+        self.inner.mmap.read_arc()
     }
 
     pub fn write(&self) -> ArcRwLockWriteGuard<RawRwLock, MmapMut> {
-        self.inner.0.write_arc()
+        self.inner.mmap.write_arc()
     }
 
     #[must_use]
     pub fn as_mut_ptr(&self) -> *mut u8 {
-        let mmap_ptr = self.inner.0.data_ptr();
+        let mmap_ptr = self.inner.mmap.data_ptr();
         let mmap = unsafe { &mut *mmap_ptr };
 
         mmap.as_mut_ptr()
@@ -51,7 +60,7 @@ impl WritableMemoryMap {
     }
 
     unsafe fn inner_mmap(&self) -> &MmapMut {
-        &*self.inner.0.data_ptr()
+        &*self.inner.mmap.data_ptr()
     }
 
     #[must_use]
@@ -69,19 +78,19 @@ impl WritableMemoryMap {
 
 impl AsRef<Arc<RwLock<MmapMut>>> for WritableMemoryMap {
     fn as_ref(&self) -> &Arc<RwLock<MmapMut>> {
-        &self.inner.0
+        &self.inner.mmap
     }
 }
 
 impl AsRef<RwLock<MmapMut>> for WritableMemoryMap {
     fn as_ref(&self) -> &RwLock<MmapMut> {
-        &self.inner.0
+        &self.inner.mmap
     }
 }
 
 impl AsRef<File> for WritableMemoryMap {
     fn as_ref(&self) -> &File {
-        &self.inner.1
+        &self.inner.file
     }
 }
 
@@ -89,6 +98,6 @@ impl Deref for WritableMemoryMap {
     type Target = RwLock<MmapMut>;
 
     fn deref(&self) -> &Self::Target {
-        &self.inner.0
+        &self.inner.mmap
     }
 }
