@@ -1,6 +1,7 @@
 use std::{
     fs::{File, OpenOptions},
     ops::Deref,
+    path::Path,
     sync::Arc,
 };
 
@@ -17,7 +18,7 @@ pub struct WritableMemoryMap {
 impl WritableMemoryMap {
     /// # Errors
     /// Returns `IoError` if mapping fails for any reason.
-    pub fn map(file_path: &str) -> Result<Self, PsMmapError> {
+    pub fn map<P: AsRef<Path>>(file_path: P) -> Result<Self, PsMmapError> {
         let file = OpenOptions::new().read(true).write(true).open(file_path)?;
         let mmap = unsafe { MmapMut::map_mut(&file)? };
 

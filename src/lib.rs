@@ -4,6 +4,8 @@ mod guards;
 mod readable;
 mod writable;
 
+use std::path::Path;
+
 pub use error::PsMmapError;
 pub use guards::{ReadGuard, WriteGuard};
 pub use readable::ReadableMemoryMap;
@@ -18,7 +20,7 @@ pub enum MemoryMap {
 impl MemoryMap {
     /// # Errors
     /// Returns `IoError` if mapping fails for any reason.
-    pub fn map(file_path: &str, readonly: bool) -> Result<Self, PsMmapError> {
+    pub fn map<P: AsRef<Path>>(file_path: P, readonly: bool) -> Result<Self, PsMmapError> {
         if readonly {
             Self::map_readable(file_path)
         } else {
@@ -28,13 +30,13 @@ impl MemoryMap {
 
     /// # Errors
     /// Returns `IoError` if mapping fails for any reason.
-    pub fn map_readable(file_path: &str) -> Result<Self, PsMmapError> {
+    pub fn map_readable<P: AsRef<Path>>(file_path: P) -> Result<Self, PsMmapError> {
         Ok(Self::Readable(ReadableMemoryMap::map(file_path)?))
     }
 
     /// # Errors
     /// Returns `IoError` if mapping fails for any reason.
-    pub fn map_writable(file_path: &str) -> Result<Self, PsMmapError> {
+    pub fn map_writable<P: AsRef<Path>>(file_path: P) -> Result<Self, PsMmapError> {
         Ok(Self::Writable(WritableMemoryMap::map(file_path)?))
     }
 
