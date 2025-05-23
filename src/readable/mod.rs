@@ -11,7 +11,13 @@ use crate::PsMmapError;
 
 #[derive(Clone, Debug)]
 pub struct ReadableMemoryMap {
-    inner: Arc<(Mmap, File)>,
+    inner: Arc<ReadableMemoryMapInner>,
+}
+
+#[derive(Debug)]
+pub struct ReadableMemoryMapInner {
+    file: File,
+    mmap: Mmap,
 }
 
 impl ReadableMemoryMap {
@@ -22,7 +28,7 @@ impl ReadableMemoryMap {
         let mmap = unsafe { Mmap::map(&file)? };
 
         let mmap = Self {
-            inner: Arc::from((mmap, file)),
+            inner: Arc::new(ReadableMemoryMapInner { file, mmap }),
         };
 
         Ok(mmap)
@@ -31,19 +37,19 @@ impl ReadableMemoryMap {
 
 impl AsRef<[u8]> for ReadableMemoryMap {
     fn as_ref(&self) -> &[u8] {
-        &self.inner.0
+        &self.inner.mmap
     }
 }
 
 impl AsRef<Mmap> for ReadableMemoryMap {
     fn as_ref(&self) -> &Mmap {
-        &self.inner.0
+        &self.inner.mmap
     }
 }
 
 impl AsRef<File> for ReadableMemoryMap {
     fn as_ref(&self) -> &File {
-        &self.inner.1
+        &self.inner.file
     }
 }
 
@@ -51,6 +57,6 @@ impl Deref for ReadableMemoryMap {
     type Target = Mmap;
 
     fn deref(&self) -> &Self::Target {
-        &self.inner.0
+        &self.inner.mmap
     }
 }
