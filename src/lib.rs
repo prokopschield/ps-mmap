@@ -1,3 +1,4 @@
+#![allow(clippy::module_name_repetitions)]
 mod error;
 mod guards;
 mod readable;
@@ -15,6 +16,8 @@ pub enum MemoryMap {
 }
 
 impl MemoryMap {
+    /// # Errors
+    /// Returns `IoError` if mapping fails for any reason.
     pub fn map(file_path: &str, readonly: bool) -> Result<Self, PsMmapError> {
         if readonly {
             Self::map_readable(file_path)
@@ -23,10 +26,14 @@ impl MemoryMap {
         }
     }
 
+    /// # Errors
+    /// Returns `IoError` if mapping fails for any reason.
     pub fn map_readable(file_path: &str) -> Result<Self, PsMmapError> {
         Ok(Self::Readable(ReadableMemoryMap::map(file_path)?))
     }
 
+    /// # Errors
+    /// Returns `IoError` if mapping fails for any reason.
     pub fn map_writable(file_path: &str) -> Result<Self, PsMmapError> {
         Ok(Self::Writable(WritableMemoryMap::map(file_path)?))
     }
@@ -41,10 +48,14 @@ impl MemoryMap {
         self.into()
     }
 
+    /// # Errors
+    /// - Returns `ReadOnly` if memory map is read-only.
     pub fn try_write(&self) -> Result<WriteGuard, PsMmapError> {
         self.try_into()
     }
 
+    /// # Errors
+    /// - Returns `ReadOnly` if memory map is read-only.
     pub fn try_into_write(self) -> Result<WriteGuard, PsMmapError> {
         self.try_into()
     }
@@ -59,6 +70,8 @@ impl MemoryMap {
         }
     }
 
+    /// # Errors
+    /// - Returns `ReadOnly` if memory map is read-only.
     pub fn try_write_with<F, R>(&self, closure: F) -> Result<R, PsMmapError>
     where
         F: FnOnce(&mut [u8]) -> R,
@@ -77,6 +90,8 @@ impl MemoryMap {
         }
     }
 
+    /// # Errors
+    /// - Returns `ReadOnly` if memory map is read-only.
     pub fn try_as_mut_ptr(&self) -> Result<*mut u8, PsMmapError> {
         match self {
             Self::Readable(_) => Err(PsMmapError::ReadOnly),
