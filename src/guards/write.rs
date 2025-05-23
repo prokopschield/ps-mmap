@@ -56,13 +56,13 @@ impl From<WriteGuard> for WritableMemoryMap {
 
 impl From<&WriteGuard> for MemoryMap {
     fn from(value: &WriteGuard) -> Self {
-        MemoryMap::Writable(value.into())
+        Self::Writable(value.into())
     }
 }
 
 impl From<WriteGuard> for MemoryMap {
     fn from(value: WriteGuard) -> Self {
-        MemoryMap::Writable(value.into())
+        Self::Writable(value.into())
     }
 }
 

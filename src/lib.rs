@@ -31,10 +31,12 @@ impl MemoryMap {
         Ok(Self::Writable(WritableMemoryMap::map(file_path)?))
     }
 
+    #[must_use]
     pub fn read(&self) -> ReadGuard {
         self.into()
     }
 
+    #[must_use]
     pub fn into_read(self) -> ReadGuard {
         self.into()
     }
@@ -67,6 +69,7 @@ impl MemoryMap {
         }
     }
 
+    #[must_use]
     pub fn as_ptr(&self) -> *const u8 {
         match self {
             Self::Readable(value) => value.as_ptr(),
@@ -81,6 +84,7 @@ impl MemoryMap {
         }
     }
 
+    #[must_use]
     pub fn len(&self) -> usize {
         match self {
             Self::Readable(value) => value.len(),
@@ -88,6 +92,7 @@ impl MemoryMap {
         }
     }
 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }

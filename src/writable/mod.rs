@@ -34,6 +34,7 @@ impl WritableMemoryMap {
         self.inner.0.write_arc()
     }
 
+    #[must_use]
     pub fn as_mut_ptr(&self) -> *mut u8 {
         let mmap_ptr = self.inner.0.data_ptr();
         let mmap = unsafe { &mut *mmap_ptr };
@@ -41,6 +42,7 @@ impl WritableMemoryMap {
         mmap.as_mut_ptr()
     }
 
+    #[must_use]
     pub fn as_ptr(&self) -> *const u8 {
         self.as_mut_ptr()
     }
@@ -49,12 +51,14 @@ impl WritableMemoryMap {
         &*self.inner.0.data_ptr()
     }
 
+    #[must_use]
     pub fn len(&self) -> usize {
         let mmap = unsafe { self.inner_mmap() };
 
         mmap.len()
     }
 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
