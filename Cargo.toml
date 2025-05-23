@@ -1,17 +1,17 @@
 [package]
 name = "ps-mmap"
 version = "0.1.0-10"
+edition = "2021"
 description = "Easy memory mapping"
 license = "GPL-3.0-or-later"
-edition = "2021"
+
+[dependencies]
+memmap2 = "0.9.4"
+parking_lot = { version = "0.12.3", features = ["arc_lock"] }
+thiserror = "1.0.61"
 
 [profile.dev]
 opt-level = 3
 
 [profile.release]
 opt-level = 3
-
-[dependencies]
-memmap2 = "0.9.4"
-parking_lot = { version = "0.12.3", features = ["arc_lock"] }
-thiserror = "1.0.61"
