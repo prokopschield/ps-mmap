@@ -1,15 +1,8 @@
 mod methods;
 
-use std::{
-    fs::{File, OpenOptions},
-    ops::Deref,
-    path::Path,
-    sync::Arc,
-};
+use std::{fs::File, ops::Deref, sync::Arc};
 
 use memmap2::Mmap;
-
-use crate::MapError;
 
 #[derive(Clone, Debug)]
 pub struct ReadableMemoryMap {
@@ -20,16 +13,6 @@ pub struct ReadableMemoryMap {
 pub struct ReadableMemoryMapInner {
     file: File,
     mmap: Mmap,
-}
-
-impl ReadableMemoryMap {
-    /// # Errors
-    /// Returns `IoError` if mapping fails for any reason.
-    pub fn map<P: AsRef<Path>>(file_path: P) -> Result<Self, MapError> {
-        let file = OpenOptions::new().read(true).write(false).open(file_path)?;
-
-        Self::map_file(file)
-    }
 }
 
 impl AsRef<[u8]> for ReadableMemoryMap {

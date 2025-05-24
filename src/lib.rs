@@ -31,7 +31,7 @@ impl MemoryMap {
     /// # Errors
     /// Returns [`MapError`] if mapping fails for any reason.
     pub fn map_readable<P: AsRef<Path>>(file_path: P) -> Result<Self, MapError> {
-        Ok(Self::Readable(ReadableMemoryMap::map(file_path)?))
+        Ok(Self::Readable(ReadableMemoryMap::map_path(file_path)?))
     }
 
     /// # Errors
