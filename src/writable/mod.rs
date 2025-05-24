@@ -8,7 +8,7 @@ use std::{
 use memmap2::MmapMut;
 use parking_lot::{ArcRwLockReadGuard, ArcRwLockWriteGuard, RawRwLock, RwLock};
 
-use crate::PsMmapError;
+use crate::MapError;
 
 #[derive(Clone, Debug)]
 pub struct WritableMemoryMap {
@@ -23,8 +23,8 @@ pub struct WritableMemoryMapInner {
 
 impl WritableMemoryMap {
     /// # Errors
-    /// Returns `IoError` if mapping fails for any reason.
-    pub fn map<P: AsRef<Path>>(file_path: P) -> Result<Self, PsMmapError> {
+    /// Returns [`MapError`] if mapping fails for any reason.
+    pub fn map<P: AsRef<Path>>(file_path: P) -> Result<Self, MapError> {
         let file = OpenOptions::new().read(true).write(true).open(file_path)?;
         let mmap = unsafe { MmapMut::map_mut(&file)? };
 

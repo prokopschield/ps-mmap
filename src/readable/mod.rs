@@ -7,7 +7,7 @@ use std::{
 
 use memmap2::Mmap;
 
-use crate::PsMmapError;
+use crate::MapError;
 
 #[derive(Clone, Debug)]
 pub struct ReadableMemoryMap {
@@ -23,7 +23,7 @@ pub struct ReadableMemoryMapInner {
 impl ReadableMemoryMap {
     /// # Errors
     /// Returns `IoError` if mapping fails for any reason.
-    pub fn map<P: AsRef<Path>>(file_path: P) -> Result<Self, PsMmapError> {
+    pub fn map<P: AsRef<Path>>(file_path: P) -> Result<Self, MapError> {
         let file = OpenOptions::new().read(true).write(false).open(file_path)?;
         let mmap = unsafe { Mmap::map(&file)? };
 

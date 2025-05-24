@@ -6,7 +6,7 @@ mod writable;
 
 use std::path::Path;
 
-pub use error::PsMmapError;
+pub use error::{MapError, PsMmapError};
 pub use guards::{ReadGuard, WriteGuard};
 pub use readable::ReadableMemoryMap;
 pub use writable::WritableMemoryMap;
@@ -19,8 +19,8 @@ pub enum MemoryMap {
 
 impl MemoryMap {
     /// # Errors
-    /// Returns `IoError` if mapping fails for any reason.
-    pub fn map<P: AsRef<Path>>(file_path: P, readonly: bool) -> Result<Self, PsMmapError> {
+    /// Returns [`MapError`] if mapping fails for any reason.
+    pub fn map<P: AsRef<Path>>(file_path: P, readonly: bool) -> Result<Self, MapError> {
         if readonly {
             Self::map_readable(file_path)
         } else {
@@ -29,14 +29,14 @@ impl MemoryMap {
     }
 
     /// # Errors
-    /// Returns `IoError` if mapping fails for any reason.
-    pub fn map_readable<P: AsRef<Path>>(file_path: P) -> Result<Self, PsMmapError> {
+    /// Returns [`MapError`] if mapping fails for any reason.
+    pub fn map_readable<P: AsRef<Path>>(file_path: P) -> Result<Self, MapError> {
         Ok(Self::Readable(ReadableMemoryMap::map(file_path)?))
     }
 
     /// # Errors
-    /// Returns `IoError` if mapping fails for any reason.
-    pub fn map_writable<P: AsRef<Path>>(file_path: P) -> Result<Self, PsMmapError> {
+    /// Returns [`MapError`] if mapping fails for any reason.
+    pub fn map_writable<P: AsRef<Path>>(file_path: P) -> Result<Self, MapError> {
         Ok(Self::Writable(WritableMemoryMap::map(file_path)?))
     }
 
