@@ -3,7 +3,7 @@ use std::ops::{Deref, DerefMut};
 use memmap2::MmapMut;
 use parking_lot::{ArcRwLockWriteGuard, RawRwLock};
 
-use crate::{MemoryMap, PsMmapError, WritableMemoryMap};
+use crate::{DerefError, MemoryMap, WritableMemoryMap};
 
 #[derive(Debug)]
 pub enum WriteGuard {
@@ -11,22 +11,22 @@ pub enum WriteGuard {
 }
 
 impl TryFrom<&MemoryMap> for WriteGuard {
-    type Error = PsMmapError;
+    type Error = DerefError;
 
     fn try_from(value: &MemoryMap) -> Result<Self, Self::Error> {
         match value {
-            MemoryMap::Readable(_) => Err(PsMmapError::ReadOnly),
+            MemoryMap::Readable(_) => Err(DerefError::ReadOnly),
             MemoryMap::Writable(value) => Ok(value.clone().into()),
         }
     }
 }
 
 impl TryFrom<MemoryMap> for WriteGuard {
-    type Error = PsMmapError;
+    type Error = DerefError;
 
     fn try_from(value: MemoryMap) -> Result<Self, Self::Error> {
         match value {
-            MemoryMap::Readable(_) => Err(PsMmapError::ReadOnly),
+            MemoryMap::Readable(_) => Err(DerefError::ReadOnly),
             MemoryMap::Writable(value) => Ok(value.into()),
         }
     }

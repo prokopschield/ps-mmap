@@ -6,7 +6,7 @@ mod writable;
 
 use std::path::Path;
 
-pub use error::{MapError, PsMmapError};
+pub use error::{DerefError, MapError};
 pub use guards::{ReadGuard, WriteGuard};
 pub use readable::ReadableMemoryMap;
 pub use writable::WritableMemoryMap;
@@ -52,13 +52,13 @@ impl MemoryMap {
 
     /// # Errors
     /// - Returns `ReadOnly` if memory map is read-only.
-    pub fn try_write(&self) -> Result<WriteGuard, PsMmapError> {
+    pub fn try_write(&self) -> Result<WriteGuard, DerefError> {
         self.try_into()
     }
 
     /// # Errors
     /// - Returns `ReadOnly` if memory map is read-only.
-    pub fn try_into_write(self) -> Result<WriteGuard, PsMmapError> {
+    pub fn try_into_write(self) -> Result<WriteGuard, DerefError> {
         self.try_into()
     }
 
@@ -74,12 +74,12 @@ impl MemoryMap {
 
     /// # Errors
     /// - Returns `ReadOnly` if memory map is read-only.
-    pub fn try_write_with<F, R>(&self, closure: F) -> Result<R, PsMmapError>
+    pub fn try_write_with<F, R>(&self, closure: F) -> Result<R, DerefError>
     where
         F: FnOnce(&mut [u8]) -> R,
     {
         match self {
-            Self::Readable(_) => Err(PsMmapError::ReadOnly),
+            Self::Readable(_) => Err(DerefError::ReadOnly),
             Self::Writable(mmap) => Ok(closure(&mut mmap.write())),
         }
     }
@@ -94,9 +94,9 @@ impl MemoryMap {
 
     /// # Errors
     /// - Returns `ReadOnly` if memory map is read-only.
-    pub fn try_as_mut_ptr(&self) -> Result<*mut u8, PsMmapError> {
+    pub fn try_as_mut_ptr(&self) -> Result<*mut u8, DerefError> {
         match self {
-            Self::Readable(_) => Err(PsMmapError::ReadOnly),
+            Self::Readable(_) => Err(DerefError::ReadOnly),
             Self::Writable(value) => Ok(value.as_mut_ptr()),
         }
     }
