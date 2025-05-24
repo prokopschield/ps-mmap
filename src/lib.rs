@@ -37,7 +37,7 @@ impl MemoryMap {
     /// # Errors
     /// Returns [`MapError`] if mapping fails for any reason.
     pub fn map_writable<P: AsRef<Path>>(file_path: P) -> Result<Self, MapError> {
-        Ok(Self::Writable(WritableMemoryMap::map(file_path)?))
+        Ok(Self::Writable(WritableMemoryMap::map_path(file_path)?))
     }
 
     #[must_use]

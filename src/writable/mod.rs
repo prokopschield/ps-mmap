@@ -1,16 +1,9 @@
 mod methods;
 
-use std::{
-    fs::{File, OpenOptions},
-    ops::Deref,
-    path::Path,
-    sync::Arc,
-};
+use std::{fs::File, ops::Deref, sync::Arc};
 
 use memmap2::MmapMut;
 use parking_lot::{ArcRwLockReadGuard, ArcRwLockWriteGuard, RawRwLock, RwLock};
-
-use crate::MapError;
 
 #[derive(Clone, Debug)]
 pub struct WritableMemoryMap {
@@ -24,14 +17,6 @@ pub struct WritableMemoryMapInner {
 }
 
 impl WritableMemoryMap {
-    /// # Errors
-    /// Returns [`MapError`] if mapping fails for any reason.
-    pub fn map<P: AsRef<Path>>(file_path: P) -> Result<Self, MapError> {
-        let file = OpenOptions::new().read(true).write(true).open(file_path)?;
-
-        Self::map_file(file)
-    }
-
     pub fn read(&self) -> ArcRwLockReadGuard<RawRwLock, MmapMut> {
         self.inner.mmap.read_arc()
     }
