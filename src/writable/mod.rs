@@ -1,3 +1,5 @@
+mod methods;
+
 use std::{
     fs::{File, OpenOptions},
     ops::Deref,
@@ -26,16 +28,8 @@ impl WritableMemoryMap {
     /// Returns [`MapError`] if mapping fails for any reason.
     pub fn map<P: AsRef<Path>>(file_path: P) -> Result<Self, MapError> {
         let file = OpenOptions::new().read(true).write(true).open(file_path)?;
-        let mmap = unsafe { MmapMut::map_mut(&file)? };
 
-        let mmap = Self {
-            inner: Arc::new(WritableMemoryMapInner {
-                file,
-                mmap: Arc::new(RwLock::new(mmap)),
-            }),
-        };
-
-        Ok(mmap)
+        Self::map_file(file)
     }
 
     pub fn read(&self) -> ArcRwLockReadGuard<RawRwLock, MmapMut> {
