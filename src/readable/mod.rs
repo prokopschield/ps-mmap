@@ -1,3 +1,5 @@
+mod methods;
+
 use std::{
     fs::{File, OpenOptions},
     ops::Deref,
@@ -25,13 +27,8 @@ impl ReadableMemoryMap {
     /// Returns `IoError` if mapping fails for any reason.
     pub fn map<P: AsRef<Path>>(file_path: P) -> Result<Self, MapError> {
         let file = OpenOptions::new().read(true).write(false).open(file_path)?;
-        let mmap = unsafe { Mmap::map(&file)? };
 
-        let mmap = Self {
-            inner: Arc::new(ReadableMemoryMapInner { file, mmap }),
-        };
-
-        Ok(mmap)
+        Self::map_file(file)
     }
 }
 
