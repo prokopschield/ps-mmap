@@ -11,6 +11,10 @@ impl ReadableMemoryMap {
     ///
     /// - [`MapError`] is returned if memory-mapping the file fails for any reason.
     pub fn map_file(file: File) -> Result<Self, MapError> {
+        // Lock the file to prevent others from mutably mapping it.
+        file.lock_shared()?;
+        // This lock is released by WritableMemoryMapInner's Drop implementation.
+
         let mmap = unsafe { Mmap::map(&file)? };
 
         let mmap = Self {
