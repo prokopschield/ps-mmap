@@ -1,3 +1,4 @@
+mod implementations;
 mod methods;
 
 use std::{fs::File, ops::Deref, sync::Arc};
