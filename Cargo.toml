@@ -6,9 +6,9 @@ description = "Easy memory mapping"
 license = "GPL-3.0-or-later"
 
 [dependencies]
-memmap2 = "0.9.5"
-parking_lot = { version = "0.12.3", features = ["arc_lock"] }
-thiserror = "2.0.12"
+memmap2 = "0.9.9"
+parking_lot = { version = "0.12.5", features = ["arc_lock"] }
+thiserror = "2.0.17"
 
 [profile.dev]
 opt-level = 3
