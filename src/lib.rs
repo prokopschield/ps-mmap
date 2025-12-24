@@ -4,6 +4,9 @@ mod guards;
 mod readable;
 mod writable;
 
+#[cfg(test)]
+mod tests;
+
 use std::path::Path;
 
 pub use error::{DerefError, MapError};
