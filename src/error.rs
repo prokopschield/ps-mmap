@@ -1,3 +1,5 @@
+use std::fs;
+
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -11,4 +13,6 @@ pub enum DerefError {
 pub enum MapError {
     #[error(transparent)]
     IoError(#[from] std::io::Error),
+    #[error("Failed to acquire exclusive lock (file may be in use by another process)")]
+    LockFailed(#[from] fs::TryLockError),
 }
