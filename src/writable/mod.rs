@@ -36,11 +36,24 @@ impl WritableMemoryMap {
         self.inner.mmap.write_arc()
     }
 
+    /// Returns a raw mutable pointer to the start of the mapped region.
+    ///
+    /// This method does not hold any synchronization guard after returning.
+    /// Callers must ensure all access through this pointer is externally
+    /// synchronized and upholds Rust aliasing rules.
+    ///
+    /// The pointer is valid only while this mapping remains alive.
     #[must_use]
     pub fn as_mut_ptr(&self) -> *mut u8 {
         self.inner.ptr
     }
 
+    /// Returns a raw const pointer to the start of the mapped region.
+    ///
+    /// This method does not hold any synchronization guard after returning.
+    /// Callers must ensure any concurrent mutation is synchronized.
+    ///
+    /// The pointer is valid only while this mapping remains alive.
     #[must_use]
     pub fn as_ptr(&self) -> *const u8 {
         self.inner.ptr.cast_const()

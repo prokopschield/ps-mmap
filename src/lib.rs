@@ -87,6 +87,11 @@ impl MemoryMap {
         }
     }
 
+    /// Returns a raw const pointer to the start of the mapped region.
+    ///
+    /// The pointer is valid only while the underlying mapping remains alive.
+    /// Dereferencing this pointer is always `unsafe`, and callers must ensure
+    /// synchronization when concurrent mutable access is possible.
     #[must_use]
     pub fn as_ptr(&self) -> *const u8 {
         match self {
@@ -97,6 +102,11 @@ impl MemoryMap {
 
     /// # Errors
     /// - Returns `ReadOnly` if memory map is read-only.
+    ///
+    /// On success, returns a raw mutable pointer to the start of the mapped
+    /// region. The pointer is valid only while the underlying mapping remains
+    /// alive. No synchronization guard is held after returning; callers must
+    /// enforce exclusive/synchronized access before dereferencing.
     pub fn try_as_mut_ptr(&self) -> Result<*mut u8, DerefError> {
         match self {
             Self::Readable(_) => Err(DerefError::ReadOnly),
