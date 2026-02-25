@@ -6,6 +6,10 @@ use crate::{readable::ReadableMemoryMapInner, MapError, ReadableMemoryMap};
 
 impl ReadableMemoryMap {
     /// Maps a readonly [`File`] into memory.
+    /// Acquires a shared file lock.
+    ///
+    /// Lock lifetime follows OS handle lifetime: the lock is released when all
+    /// duplicated handles for this file description are closed.
     ///
     /// # Errors
     ///
@@ -13,7 +17,6 @@ impl ReadableMemoryMap {
     pub fn map_file(file: File) -> Result<Self, MapError> {
         // Lock the file to prevent others from mutably mapping it.
         file.lock_shared()?;
-        // This lock is released by WritableMemoryMapInner's Drop implementation.
 
         let mmap = unsafe { Mmap::map(&file)? };
 

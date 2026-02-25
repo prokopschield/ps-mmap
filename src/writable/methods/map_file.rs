@@ -7,6 +7,10 @@ use crate::{error::MapError, writable::WritableMemoryMapInner, WritableMemoryMap
 
 impl WritableMemoryMap {
     /// Maps a writable [`File`] into mutable memory.
+    /// Acquires an exclusive file lock.
+    ///
+    /// Lock lifetime follows OS handle lifetime: the lock is released when all
+    /// duplicated handles for this file description are closed.
     ///
     /// # Errors
     ///
@@ -14,7 +18,6 @@ impl WritableMemoryMap {
     pub fn map_file(file: File) -> Result<Self, MapError> {
         // Lock the file to prevent others from mutably mapping it.
         file.try_lock()?;
-        // This lock is released by WritableMemoryMapInner's Drop implementation.
 
         let mut mmap = unsafe { MmapMut::map_mut(&file) }?;
         let ptr = mmap.as_mut_ptr();

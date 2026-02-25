@@ -1,4 +1,3 @@
-mod implementations;
 mod methods;
 
 use std::{fs::File, ops::Deref, sync::Arc};
@@ -70,6 +69,10 @@ impl AsRef<RwLock<MmapMut>> for WritableMemoryMap {
     }
 }
 
+/// Exposes the file handle that owns the OS file lock for this mapping.
+///
+/// Cloning the returned handle (`File::try_clone`) may extend lock lifetime
+/// beyond the lifetime of this `WritableMemoryMap`.
 impl AsRef<File> for WritableMemoryMap {
     fn as_ref(&self) -> &File {
         &self.inner.file

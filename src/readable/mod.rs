@@ -27,6 +27,10 @@ impl AsRef<Mmap> for ReadableMemoryMap {
     }
 }
 
+/// Exposes the file handle that owns the shared OS file lock for this mapping.
+///
+/// Cloning the returned handle (`File::try_clone`) may extend lock lifetime
+/// beyond the lifetime of this `ReadableMemoryMap`.
 impl AsRef<File> for ReadableMemoryMap {
     fn as_ref(&self) -> &File {
         &self.inner.file
