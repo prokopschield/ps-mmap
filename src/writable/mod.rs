@@ -15,7 +15,18 @@ pub struct WritableMemoryMap {
 pub struct WritableMemoryMapInner {
     file: File,
     mmap: Arc<RwLock<MmapMut>>,
+    ptr: *mut u8,
+    len: usize,
 }
+
+// SAFETY: `ptr` is created from `mmap.as_mut_ptr()` at construction and never changes.
+// The mapping is never replaced/resized while this value lives, and safe access to mapped
+// bytes remains synchronized via `RwLock<MmapMut>`.
+unsafe impl Send for WritableMemoryMapInner {}
+
+// SAFETY: same invariants as above; `ptr` is metadata and not dereferenced internally
+// without synchronization.
+unsafe impl Sync for WritableMemoryMapInner {}
 
 impl WritableMemoryMap {
     pub fn read(&self) -> ArcRwLockReadGuard<RawRwLock, MmapMut> {
@@ -28,26 +39,17 @@ impl WritableMemoryMap {
 
     #[must_use]
     pub fn as_mut_ptr(&self) -> *mut u8 {
-        let mmap_ptr = self.inner.mmap.data_ptr();
-        let mmap = unsafe { &mut *mmap_ptr };
-
-        mmap.as_mut_ptr()
+        self.inner.ptr
     }
 
     #[must_use]
     pub fn as_ptr(&self) -> *const u8 {
-        self.as_mut_ptr()
-    }
-
-    unsafe fn inner_mmap(&self) -> &MmapMut {
-        &*self.inner.mmap.data_ptr()
+        self.inner.ptr.cast_const()
     }
 
     #[must_use]
     pub fn len(&self) -> usize {
-        let mmap = unsafe { self.inner_mmap() };
-
-        mmap.len()
+        self.inner.len
     }
 
     #[must_use]

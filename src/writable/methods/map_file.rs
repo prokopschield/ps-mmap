@@ -16,12 +16,16 @@ impl WritableMemoryMap {
         file.try_lock()?;
         // This lock is released by WritableMemoryMapInner's Drop implementation.
 
-        let mmap = unsafe { MmapMut::map_mut(&file) }?;
+        let mut mmap = unsafe { MmapMut::map_mut(&file) }?;
+        let ptr = mmap.as_mut_ptr();
+        let len = mmap.len();
 
         let mmap = Self {
             inner: Arc::new(WritableMemoryMapInner {
                 file,
                 mmap: Arc::new(RwLock::new(mmap)),
+                ptr,
+                len,
             }),
         };
 
