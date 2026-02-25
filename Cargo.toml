@@ -3,6 +3,9 @@ name = "ps-mmap"
 version = "0.1.0-14"
 edition = "2021"
 description = "Easy memory mapping"
+documentation = "https://docs.rs/ps-mmap"
+homepage = "https://github.com/prokopschield/ps-mmap"
+repository = "https://github.com/prokopschield/ps-mmap"
 license = "GPL-3.0-or-later"
 
 [dependencies]
