@@ -1,6 +1,6 @@
 [package]
 name = "ps-mmap"
-version = "0.1.0-14"
+version = "0.1.0-15"
 edition = "2021"
 description = "Easy memory mapping"
 documentation = "https://docs.rs/ps-mmap"
