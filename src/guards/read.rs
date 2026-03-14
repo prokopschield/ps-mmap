@@ -3,11 +3,11 @@ use std::ops::Deref;
 use memmap2::MmapMut;
 use parking_lot::{ArcRwLockReadGuard, RawRwLock};
 
-use crate::{MemoryMap, ReadableMemoryMap, WritableMemoryMap};
+use crate::{MemoryMap, ReadonlyMemoryMap, WritableMemoryMap};
 
 #[derive(Debug)]
 pub enum ReadGuard {
-    Readable(ReadableMemoryMap),
+    Readonly(ReadonlyMemoryMap),
     Writable(ArcRwLockReadGuard<RawRwLock, MmapMut>, WritableMemoryMap),
 }
 
@@ -20,15 +20,15 @@ impl From<&MemoryMap> for ReadGuard {
 impl From<MemoryMap> for ReadGuard {
     fn from(value: MemoryMap) -> Self {
         match value {
-            MemoryMap::Readable(value) => value.into(),
+            MemoryMap::Readonly(value) => value.into(),
             MemoryMap::Writable(value) => value.into(),
         }
     }
 }
 
-impl From<ReadableMemoryMap> for ReadGuard {
-    fn from(value: ReadableMemoryMap) -> Self {
-        Self::Readable(value)
+impl From<ReadonlyMemoryMap> for ReadGuard {
+    fn from(value: ReadonlyMemoryMap) -> Self {
+        Self::Readonly(value)
     }
 }
 
@@ -41,7 +41,7 @@ impl From<WritableMemoryMap> for ReadGuard {
 impl From<&ReadGuard> for MemoryMap {
     fn from(value: &ReadGuard) -> Self {
         match value {
-            ReadGuard::Readable(value) => Self::Readable(value.clone()),
+            ReadGuard::Readonly(value) => Self::Readonly(value.clone()),
             ReadGuard::Writable(_, value) => Self::Writable(value.clone()),
         }
     }
@@ -50,7 +50,7 @@ impl From<&ReadGuard> for MemoryMap {
 impl From<ReadGuard> for MemoryMap {
     fn from(value: ReadGuard) -> Self {
         match value {
-            ReadGuard::Readable(value) => Self::Readable(value),
+            ReadGuard::Readonly(value) => Self::Readonly(value),
             ReadGuard::Writable(_, value) => Self::Writable(value),
         }
     }
@@ -59,7 +59,7 @@ impl From<ReadGuard> for MemoryMap {
 impl AsRef<[u8]> for ReadGuard {
     fn as_ref(&self) -> &[u8] {
         match self {
-            Self::Readable(value) => value,
+            Self::Readonly(value) => value,
             Self::Writable(value, _) => value,
         }
     }
