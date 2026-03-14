@@ -9,9 +9,9 @@ repository = "https://github.com/prokopschield/ps-mmap"
 license = "GPL-3.0-or-later"
 
 [dependencies]
-memmap2 = "0.9.9"
+memmap2 = "0.9.10"
 parking_lot = { version = "0.12.5", features = ["arc_lock"] }
-thiserror = "2.0.17"
+thiserror = "2.0.18"
 
 [profile.dev]
 opt-level = 3
