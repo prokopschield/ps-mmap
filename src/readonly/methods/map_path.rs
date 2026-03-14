@@ -1,8 +1,8 @@
 use std::{fs::OpenOptions, path::Path};
 
-use crate::{MapError, ReadableMemoryMap};
+use crate::{MapError, ReadOnlyMemoryMap};
 
-impl ReadableMemoryMap {
+impl ReadOnlyMemoryMap {
     /// Maps the file at a given path into memory.
     ///
     /// # Errors

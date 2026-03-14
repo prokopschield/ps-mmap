@@ -1,7 +1,7 @@
 #![allow(clippy::module_name_repetitions)]
 mod error;
 mod guards;
-mod readable;
+mod readonly;
 mod writable;
 
 #[cfg(test)]
@@ -11,12 +11,12 @@ use std::path::Path;
 
 pub use error::{DerefError, MapError};
 pub use guards::{ReadGuard, WriteGuard};
-pub use readable::ReadableMemoryMap;
+pub use readonly::ReadOnlyMemoryMap;
 pub use writable::WritableMemoryMap;
 
 #[derive(Clone, Debug)]
 pub enum MemoryMap {
-    Readable(ReadableMemoryMap),
+    ReadOnly(ReadOnlyMemoryMap),
     Writable(WritableMemoryMap),
 }
 
@@ -25,7 +25,7 @@ impl MemoryMap {
     /// Returns [`MapError`] if mapping fails for any reason.
     pub fn map<P: AsRef<Path>>(file_path: P, readonly: bool) -> Result<Self, MapError> {
         if readonly {
-            Self::map_readable(file_path)
+            Self::map_readonly(file_path)
         } else {
             Self::map_writable(file_path)
         }
@@ -33,8 +33,8 @@ impl MemoryMap {
 
     /// # Errors
     /// Returns [`MapError`] if mapping fails for any reason.
-    pub fn map_readable<P: AsRef<Path>>(file_path: P) -> Result<Self, MapError> {
-        Ok(Self::Readable(ReadableMemoryMap::map_path(file_path)?))
+    pub fn map_readonly<P: AsRef<Path>>(file_path: P) -> Result<Self, MapError> {
+        Ok(Self::ReadOnly(ReadOnlyMemoryMap::map_path(file_path)?))
     }
 
     /// # Errors
@@ -70,7 +70,7 @@ impl MemoryMap {
         F: FnOnce(&[u8]) -> R,
     {
         match self {
-            Self::Readable(mmap) => closure(mmap),
+            Self::ReadOnly(mmap) => closure(mmap),
             Self::Writable(mmap) => closure(&mmap.read()),
         }
     }
@@ -82,7 +82,7 @@ impl MemoryMap {
         F: FnOnce(&mut [u8]) -> R,
     {
         match self {
-            Self::Readable(_) => Err(DerefError::ReadOnly),
+            Self::ReadOnly(_) => Err(DerefError::ReadOnly),
             Self::Writable(mmap) => Ok(closure(&mut mmap.write())),
         }
     }
@@ -95,7 +95,7 @@ impl MemoryMap {
     #[must_use]
     pub fn as_ptr(&self) -> *const u8 {
         match self {
-            Self::Readable(value) => value.as_ptr(),
+            Self::ReadOnly(value) => value.as_ptr(),
             Self::Writable(value) => value.as_ptr(),
         }
     }
@@ -109,7 +109,7 @@ impl MemoryMap {
     /// enforce exclusive/synchronized access before dereferencing.
     pub fn try_as_mut_ptr(&self) -> Result<*mut u8, DerefError> {
         match self {
-            Self::Readable(_) => Err(DerefError::ReadOnly),
+            Self::ReadOnly(_) => Err(DerefError::ReadOnly),
             Self::Writable(value) => Ok(value.as_mut_ptr()),
         }
     }
@@ -117,7 +117,7 @@ impl MemoryMap {
     #[must_use]
     pub fn len(&self) -> usize {
         match self {
-            Self::Readable(value) => value.len(),
+            Self::ReadOnly(value) => value.len(),
             Self::Writable(value) => value.len(),
         }
     }

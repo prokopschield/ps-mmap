@@ -2,9 +2,9 @@ use std::{fs::File, sync::Arc};
 
 use memmap2::Mmap;
 
-use crate::{readable::ReadableMemoryMapInner, MapError, ReadableMemoryMap};
+use crate::{readonly::ReadOnlyMemoryMapInner, MapError, ReadOnlyMemoryMap};
 
-impl ReadableMemoryMap {
+impl ReadOnlyMemoryMap {
     /// Maps a readonly [`File`] into memory.
     /// Acquires a shared file lock.
     ///
@@ -21,7 +21,7 @@ impl ReadableMemoryMap {
         let mmap = unsafe { Mmap::map(&file)? };
 
         let mmap = Self {
-            inner: Arc::new(ReadableMemoryMapInner { file, mmap }),
+            inner: Arc::new(ReadOnlyMemoryMapInner { file, mmap }),
         };
 
         Ok(mmap)

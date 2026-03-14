@@ -4,7 +4,7 @@ use crate::MemoryMap;
 
 #[test]
 fn as_ptr() {
-    let mmap = MemoryMap::map_readable("Cargo.toml").expect("Failed to map Cargo.toml");
+    let mmap = MemoryMap::map_readonly("Cargo.toml").expect("Failed to map Cargo.toml");
     let ptr = mmap.as_ptr();
 
     let equals = unsafe { *ptr.add(15) };

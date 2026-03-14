@@ -15,7 +15,7 @@ impl TryFrom<&MemoryMap> for WriteGuard {
 
     fn try_from(value: &MemoryMap) -> Result<Self, Self::Error> {
         match value {
-            MemoryMap::Readable(_) => Err(DerefError::ReadOnly),
+            MemoryMap::ReadOnly(_) => Err(DerefError::ReadOnly),
             MemoryMap::Writable(value) => Ok(value.clone().into()),
         }
     }
@@ -26,7 +26,7 @@ impl TryFrom<MemoryMap> for WriteGuard {
 
     fn try_from(value: MemoryMap) -> Result<Self, Self::Error> {
         match value {
-            MemoryMap::Readable(_) => Err(DerefError::ReadOnly),
+            MemoryMap::ReadOnly(_) => Err(DerefError::ReadOnly),
             MemoryMap::Writable(value) => Ok(value.into()),
         }
     }
